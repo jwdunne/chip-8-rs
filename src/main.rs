@@ -29,6 +29,43 @@ const FONT_SPRITES: [u8; 80] = [
     0xF0, 0x80, 0xF0, 0x80, 0x80, // F
 ];
 
+enum Opcode {
+    Cls,
+    Ret,
+    Jp(u16),
+    Call(u16),
+    Se(usize, u8),
+    Sne(usize, u8),
+    Ser(usize, usize), // mnemonic is the same as SE, but comparing two registers
+    Ld(usize, u8),
+    Add(usize, u8),
+    Ldr(usize, usize),
+    Or(usize, usize),
+    And(usize, usize),
+    Xor(usize, usize),
+    Addr(usize, usize),
+    Subr(usize, usize),
+    Shr(usize, Option<usize>),
+    Subn(usize, usize),
+    Shl(usize, Option<usize>),
+    Sner(usize, usize),
+    Lda(usize, u16),
+    Jpl(u16),
+    Rnd(usize, u8),
+    Drw(usize, usize, u8),
+    Skp(usize),
+    Sknp(usize),
+    Rddt(usize),
+    Ldk(usize),
+    Lddt(usize),
+    Ldst(usize),
+    Addi(usize),
+    Ldf(usize),
+    Ldb(usize),
+    Ldi(usize),
+    Ldv(usize),
+}
+
 struct Chip8 {
     memory: [u8; 4096],
     v: [u8; 16],
