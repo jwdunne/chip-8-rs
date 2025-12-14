@@ -1,4 +1,4 @@
-use std::{env, process};
+use std::{env, fs::read, process};
 
 use minifb::{Key, Window, WindowOptions};
 
@@ -7,6 +7,8 @@ const BLACK: u32 = 0x000000;
 const WIDTH: usize = 64;
 const HEIGHT: usize = 32;
 const SCALE: usize = 10;
+
+const PROGRAM_START: u16 = 0x200;
 
 const FONT_SPRITES: [u8; 80] = [
     0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -41,12 +43,12 @@ struct Chip8 {
 }
 
 impl Chip8 {
-    fn new() -> Self {
+    fn new(program: &[u8]) -> Self {
         let mut machine = Self {
             memory: [0; 4096],
             v: [0; 16],
             i: 0,
-            pc: 0x200,
+            pc: PROGRAM_START,
             stack: [0; 64],
             sp: 0,
             delay_timer: 0,
@@ -60,11 +62,17 @@ impl Chip8 {
             machine.memory[offset + i] = piece;
         }
 
+        for (i, &byte) in program.iter().enumerate() {
+            machine.memory[PROGRAM_START as usize + i] = byte;
+        }
+
         machine
     }
 }
 
 fn main() {
+    // Initialisation
+
     let bin = env::args().nth(0).unwrap();
 
     let rom_path = match env::args().nth(1) {
@@ -76,6 +84,9 @@ fn main() {
     };
 
     println!("Running: {bin} {rom_path}");
+
+    let program = read(rom_path).expect("could not read ROM file");
+    let _machine = Chip8::new(&program);
 
     let mut buffer: Vec<u32> = vec![0; WIDTH * HEIGHT];
 
